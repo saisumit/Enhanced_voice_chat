@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "775370436728",
+    "firebase_url": "https://chatapplication-8a107.firebaseio.com",
+    "project_id": "chatapplication-8a107",
+    "storage_bucket": "chatapplication-8a107.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:775370436728:android:38dfc078253a2c17",
+        "android_client_info": {
+          "package_name": "com.example.saisumit.test_application"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "775370436728-9b4j3kic0rdjn11r8mpb4af62agmmpge.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRBBNqWtnwm-PsiZSrqqmz1RCUVGqcDHE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
