@@ -13,5 +13,6 @@ public class MyApplication  extends android.app.Application{
         super.onCreate();
         Firebase.setAndroidContext(this);
 
+
     }
 }
