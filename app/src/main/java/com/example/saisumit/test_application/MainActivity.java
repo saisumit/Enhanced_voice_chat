@@ -116,26 +116,28 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-//                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(ref) ;
-//                com.google.firebase.database.Query lastQuery = databaseReference.child("chatapplication-8a107").orderByKey().limitToLast(1);
-//                lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-//                        String message = dataSnapshot.child("messageText").getValue().toString();
-//                        Log.e("message + ", message) ;
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//                        //Handle possible errors.
-//                    }
-//
-//
-//
-//            });
-                     String toSpeak = ed1 ;
-                     Toast.makeText(getApplicationContext(), toSpeak, Toast.LENGTH_SHORT).show();
-                     t1.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://chatapplication-8a107.firebaseio.com/") ;
+                com.google.firebase.database.Query lastQuery = databaseReference.limitToLast(1);
+
+                lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String message = dataSnapshot.getValue().toString();
+                        Log.e("message + ", message) ;
+                        String toSpeak = message ;
+                        Toast.makeText(getApplicationContext(), toSpeak, Toast.LENGTH_SHORT).show();
+                        t1.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        //Handle possible errors.
+                    }
+
+
+
+            });
+
 
 
             }
