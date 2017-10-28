@@ -2,6 +2,7 @@ package com.example.saisumit.test_application;
 
 import android.app.DownloadManager;
 import android.content.Intent;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -24,11 +25,22 @@ import com.firebase.client.Query;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    //Experiment
+    TextToSpeech t1;
+    String ed1;
+    //!Experiment
+
 
     public static int SIGN_IN_REQUEST_CODE=101;
     public static String TAG="MainActivity";
@@ -87,6 +99,58 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+
+        // Experiment
+        FloatingActionButton b1 =  (FloatingActionButton)findViewById(R.id.speak);
+       // ed1.setText("Hey Sumit miss u a lot");
+        t1 = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    t1.setLanguage(Locale.UK);
+                }
+            }
+        });
+
+        b1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+//                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(ref) ;
+//                com.google.firebase.database.Query lastQuery = databaseReference.child("chatapplication-8a107").orderByKey().limitToLast(1);
+//                lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        String message = dataSnapshot.child("messageText").getValue().toString();
+//                        Log.e("message + ", message) ;
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {
+//                        //Handle possible errors.
+//                    }
+//
+//
+//
+//            });
+                     String toSpeak = ed1 ;
+                     Toast.makeText(getApplicationContext(), toSpeak, Toast.LENGTH_SHORT).show();
+                     t1.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
+
+
+            }
+        });
+
+        // !Experiment
+
+    }
+
+    public void onPause(){
+        if(t1 !=null){
+            t1.stop();
+            t1.shutdown();
+        }
+        super.onPause();
     }
 
     private void displayChatMessages() {
@@ -102,6 +166,14 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 protected void populateView(View v, ChatMessage model, int position) {
                 // Get references to the views of message.xml
+//                // Experiment
+                    TextView theFact = (TextView) v.findViewById(R.id.message_text);
+                    String shareFact = theFact.getText().toString();
+                    Log.e("Lets read the messages " , shareFact + " " + position ) ;
+                    ed1 = shareFact  ;
+
+//                // !Experiment
+
                 TextView messageText = v.findViewById(R.id.message_text);
                 TextView messageUser = v.findViewById(R.id.message_user);
                 TextView messageTime = v.findViewById(R.id.message_time);
@@ -118,6 +190,8 @@ public class MainActivity extends AppCompatActivity {
 
         listOfMessages.setAdapter(adapter);
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode,
