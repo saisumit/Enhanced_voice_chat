@@ -125,10 +125,11 @@ public class MainActivity extends AppCompatActivity {
                         String message = dataSnapshot.getValue().toString();
                         Log.e("message + ", message) ;
                         String[] messagearray = message.split("messageText=") ;
+                        Log.e("message array", messagearray[0]) ;
                         String[] toSpeak = messagearray[1].split(", messageTime");
-                        String[] messageUser = toSpeak[1].split("messageUser");
-                        String finalspeak = " message sender " + messageUser[1].substring(0,messageUser[1].length()-2) + " message Text = " + toSpeak[0] ;
-                        Log.e("message user",messageUser[1]);
+                        String[] messageUser = toSpeak[0].split("messageUser");
+                        String finalspeak = " message Text = " + toSpeak[0].substring(0,toSpeak[0].length()-2) ;
+                        Log.e("message user",messageUser[0]);
                         Toast.makeText(getApplicationContext(), finalspeak, Toast.LENGTH_SHORT).show();
                         t1.speak(finalspeak, TextToSpeech.QUEUE_FLUSH, null);
                     }
