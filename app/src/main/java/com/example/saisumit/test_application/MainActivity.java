@@ -1,7 +1,9 @@
 package com.example.saisumit.test_application;
 
 import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -31,20 +33,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    //Experiment
     TextToSpeech t1;
     String ed1;
-    //!Experiment
-
 
     public static int SIGN_IN_REQUEST_CODE=101;
+    public static int SPEECH_RECOGNITION_CODE=102;
     public static String TAG="MainActivity";
     private FirebaseListAdapter<ChatMessage> adapter;
+    private EditText mInputBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Firebase.setAndroidContext(this);
-
         if(FirebaseAuth.getInstance().getCurrentUser() == null) {
             // Start sign in/sign up activity
             startActivityForResult(
@@ -64,37 +65,34 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // User is already signed in. Therefore, display
             // a welcome Toast
-            Toast.makeText(this,
-                    "Welcome " + FirebaseAuth.getInstance()
+            Toast.makeText(this, "Welcome " + FirebaseAuth.getInstance()
                             .getCurrentUser()
-                            .getDisplayName(),
-                    Toast.LENGTH_LONG)
-                    .show();
+                            .getDisplayName(), Toast.LENGTH_LONG).show();
 
             // Load chat room contents
             displayChatMessages();
         }
 
+        mInputBox = findViewById(R.id.input);
         FloatingActionButton fab = findViewById(R.id.fab);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText input = findViewById(R.id.input);
 
                 // Read the input field and push a new instance
                 // of ChatMessage to the Firebase database
                 FirebaseDatabase.getInstance()
                         .getReference()
                         .push()
-                        .setValue(new ChatMessage(input.getText().toString(),
+                        .setValue(new ChatMessage(mInputBox.getText().toString(),
                                         FirebaseAuth.getInstance()
                                                 .getCurrentUser()
                                                 .getDisplayName())
                         );
 
                 // Clear the input
-                input.setText("");
+                mInputBox.setText("");
             }
         });
 
@@ -128,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("message array", messagearray[0]) ;
                         String[] toSpeak = messagearray[1].split(", messageTime");
                         String[] messageUser = toSpeak[0].split("messageUser");
-                        String finalspeak = " message Text = " + toSpeak[0].substring(0,toSpeak[0].length()-2) ;
+                        String finalspeak = "Latest message " + toSpeak[0].substring(0,toSpeak[0].length()-2) ;
                         Log.e("message user",messageUser[0]);
                         Toast.makeText(getApplicationContext(), finalspeak, Toast.LENGTH_SHORT).show();
                         t1.speak(finalspeak, TextToSpeech.QUEUE_FLUSH, null);
@@ -138,17 +136,19 @@ public class MainActivity extends AppCompatActivity {
                     public void onCancelled(DatabaseError databaseError) {
                         //Handle possible errors.
                     }
-
-
-
             });
-
-
-
             }
         });
 
         // !Experiment
+
+        FloatingActionButton mic_button =  findViewById(R.id.mic);
+        mic_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startSpeechToText();
+            }
+        });
 
     }
 
@@ -199,6 +199,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void startSpeechToText() {
+
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
+                "Speak something...");
+        try {
+            startActivityForResult(intent, SPEECH_RECOGNITION_CODE);
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(getApplicationContext(),
+                    "Sorry! Speech recognition is not supported in this device.",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode,
@@ -213,6 +229,14 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this,"We couldn't sign you in. Please try again later.", Toast.LENGTH_LONG).show();
                 // Close the app
                 finish();
+            }
+        }
+        else if(requestCode == SPEECH_RECOGNITION_CODE){
+            if (resultCode == RESULT_OK && null != data) {
+                ArrayList<String> result = data
+                        .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                String text = result.get(0);
+                mInputBox.setText(text);
             }
         }
 
@@ -236,6 +260,10 @@ public class MainActivity extends AppCompatActivity {
                             finish();
                         }
                     });
+        }
+        else if(item.getItemId() == R.id.events){
+            Intent intent = new Intent(this, EventsActivity.class);
+            startActivity(intent);
         }
         return true;
     }
